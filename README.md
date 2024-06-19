@@ -62,12 +62,6 @@ command to run if program contains helper info
 
 Contributors names and contact info
 
-ex. Peter Yuk  
-ex. [Dokyung Yuk](https://www.linkedin.com/in/dokyung-yuk-a3aba3254/)
-
-## License
-
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
-
-## Acknowledgments
-
+Dokyung(Peter) Yuk
+- [LinkedIn](https://www.linkedin.com/in/dokyung-yuk-a3aba3254/)
+- [Gmail](peteryuk91@gmail.com) 
