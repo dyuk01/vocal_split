@@ -51,7 +51,10 @@ If you are using a virtual environment, ensure it is activated:
 source demucs-env/bin/activate  # On Windows, use `demucs-env\Scripts\activate`
 ```
 
-3. **Run the Script**
+3. **Precaution**
+Filename cannot contain any spaces. Make sure to remove any spaces before running the program
+
+4. **Run the Script**
 Run the script using Python:
 ```bash
 python music_separator.py
