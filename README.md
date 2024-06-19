@@ -46,23 +46,22 @@ This is a Python script that uses `demucs` to separate vocals and instrumental t
 
     Open a terminal and navigate to the directory containing music_separator.py.
 
-2. **Activate the Virtual Environment**
-
-    If you are using a virtual environment, ensure it is activated:
-```bash
-source demucs-env/bin/activate  # On Windows, use `demucs-env\Scripts\activate`
-```
-
-3. **Precaution**
+2. **Precaution**
 
     Filename cannot contain any spaces. Make sure to remove any spaces before running the program
 
-4. **Run the Script**
+3. **Run the Script**
 
     Run the script using Python:
 ```bash
 python music_separator.py
 ```
+
+4. **Using the GUI**
+
+    1. Click the "Browse" button to select an input MP3 file.
+    2. Click the "Separate Music" button to start the separation process.
+    3. The separated files will be saved in a folder named VocalSplit_Output on your desktop.
 
 ## Authors
 Name and contact info
