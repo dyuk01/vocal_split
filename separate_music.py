@@ -27,15 +27,17 @@ def classify_pitch(y, sr):
     return falsetto, true_voice, high_pitch, low_pitch
 
 # Function to segment and save classified pitch
-def save_segments(y, sr, segments, output_path, label):
+def save_segments(y, sr, segments, output_folder, label):
     segment_length = int(sr * 0.1)  # 100ms segments
+    label_folder = os.path.join(output_folder, label)
+    os.makedirs(label_folder, exist_ok=True)
+
     for i, (t, _) in enumerate(segments):
         start_sample = int(t)
         end_sample = int(start_sample + segment_length)
-        print(start_sample, end_sample)
         if start_sample < len(y) and end_sample <= len(y):
             segment = y[start_sample:end_sample]
-            filename = os.path.join(output_path, f'{label}_segment_{i}.wav')
+            filename = os.path.join(label_folder, f'{label}_segment_{i}.wav')
             sf.write(filename, segment, sr)
         else:
             print(f"Skipping segment {i} for {label}: start_sample {start_sample} or end_sample {end_sample} out of bounds.")
