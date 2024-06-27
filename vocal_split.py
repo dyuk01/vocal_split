@@ -28,7 +28,7 @@ def separate_music():
         os.makedirs(output_folder)
 
     # Run Demucs to separate the music file using the specified model
-    command = f"demucs --out {output_folder} {input_file}"
+    command = f"demucs -n mdx_extra_q --out {output_folder} {input_file}"
     result = subprocess.run(command, shell=True, executable='/bin/bash')
 
     # Check the result

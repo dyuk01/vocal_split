@@ -1,7 +1,7 @@
 import os
 import subprocess
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog
 import librosa
 import numpy as np
 import soundfile as sf
