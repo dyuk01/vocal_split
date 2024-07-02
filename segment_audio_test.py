@@ -30,11 +30,19 @@ def segment_audio(file_path, segment_duration):
     
     print(f"Segments saved in {output_dir}")
 
+def delete_silent_files(directory_path, silence_threshold=0.001):
+    for file_path in Path(directory_path).glob("*.wav"):
+        y, sr = librosa.load(file_path, sr=None)
+        if np.max(np.abs(y)) < silence_threshold:
+            os.remove(file_path)
+            print(f"Deleted silent file: {file_path}")
+
 def process_directory(directory_path, segment_duration):
     audio_files = [f for f in os.listdir(directory_path) if f.endswith('.wav')]
     for audio_file in audio_files:
-        file_path = os.path.join(directory_path, audio_file)
+        file_path = Path(directory_path) / audio_file
         segment_audio(file_path, segment_duration)
+        delete_silent_files(file_path.parent / (file_path.stem + "_segments"))
 
 # Example usage
-process_directory("vocal/", .1)
+process_directory("vocal/", 1)
