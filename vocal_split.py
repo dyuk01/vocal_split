@@ -1,53 +1,48 @@
 import os
-import subprocess
-import tkinter as tk
-from tkinter import filedialog, messagebox
+import librosa
+import soundfile as sf
+import numpy as np
+from pathlib import Path
 
-# Function to select input file
-def select_input_file():
-    input_file = filedialog.askopenfilename(title="Select Input Music File",
-                                            filetypes=(("MP3 files", "*.mp3"), ("All files", "*.*")))
-    if input_file:
-        input_file_entry.delete(0, tk.END)
-        input_file_entry.insert(0, input_file)
+def segment_audio(file_path, segment_duration):
+    y, sr = librosa.load(file_path, sr=None)
+    segment_length = int(segment_duration * sr)
+    total_length = len(y)
+    num_segments = total_length // segment_length
+    remainder = total_length % segment_length
 
-# Function to separate music
-def separate_music():
-    input_file = input_file_entry.get()
+    file_path = Path(file_path)
+    output_dir = file_path.parent / (file_path.stem + "_segments")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    for i in range(num_segments):
+        start = i * segment_length
+        end = start + segment_length
+        segment = y[start:end]
+        segment_filename = output_dir / f"{file_path.stem}_segment_{i+1}.wav"
+        sf.write(segment_filename, segment, sr)
     
-    if not input_file:
-        messagebox.showerror("Error", "Please select an input file.")
-        return
+    if remainder != 0:
+        start = num_segments * segment_length
+        segment = y[start:]
+        segment_filename = output_dir / f"{file_path.stem}_segment_{num_segments+1}.wav"
+        sf.write(segment_filename, segment, sr)
+    
+    print(f"Segments saved in {output_dir}")
 
-    # Output folder path
-    desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
-    output_folder = os.path.join(desktop_path, 'VocalSplit_Output')
+def delete_silent_files(directory_path, silence_threshold=0.001):
+    for file_path in Path(directory_path).glob("*.wav"):
+        y, sr = librosa.load(file_path, sr=None)
+        if np.max(np.abs(y)) < silence_threshold:
+            os.remove(file_path)
+            print(f"Deleted silent file: {file_path}")
 
-    # Create output folder if it does not exist
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
+def process_directory(directory_path, segment_duration):
+    audio_files = [f for f in os.listdir(directory_path) if f.endswith('.wav')]
+    for audio_file in audio_files:
+        file_path = Path(directory_path) / audio_file
+        segment_audio(file_path, segment_duration)
+        delete_silent_files(file_path.parent / (file_path.stem + "_segments"))
 
-    # Run Demucs to separate the music file using the specified model
-    command = f"demucs -n mdx_extra_q --out {output_folder} {input_file}"
-    result = subprocess.run(command, shell=True, executable='/bin/bash')
-
-    # Check the result
-    if result.returncode == 0:
-        messagebox.showinfo("Success", f'Separation complete. Check the {output_folder} folder for results.')
-    else:
-        messagebox.showerror("Error", "An error occurred during the separation process.")
-
-# Create the main window
-root = tk.Tk()
-root.title("Music Separator")
-
-# Create and place the widgets
-tk.Label(root, text="Input Music File:").grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
-input_file_entry = tk.Entry(root, width=50)
-input_file_entry.grid(row=0, column=1, padx=10, pady=10)
-tk.Button(root, text="Browse", command=select_input_file).grid(row=0, column=2, padx=10, pady=10)
-
-tk.Button(root, text="Separate Music", command=separate_music).grid(row=1, column=0, columnspan=3, pady=20)
-
-# Run the application
-root.mainloop()
+# Example usage
+process_directory("vocal/", 1)
