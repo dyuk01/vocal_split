@@ -1,8 +1,10 @@
+import os
 import librosa
 import soundfile as sf
+import numpy as np
 from pathlib import Path
 
-def segment_audio(file_path, segment_duration=5):
+def segment_audio(file_path, segment_duration):
     y, sr = librosa.load(file_path, sr=None)
     segment_length = int(segment_duration * sr)
     total_length = len(y)
@@ -28,13 +30,11 @@ def segment_audio(file_path, segment_duration=5):
     
     print(f"Segments saved in {output_dir}")
 
-import os
-
-def process_directory(directory_path):
+def process_directory(directory_path, segment_duration):
     audio_files = [f for f in os.listdir(directory_path) if f.endswith('.wav')]
     for audio_file in audio_files:
         file_path = os.path.join(directory_path, audio_file)
-        segment_audio(file_path)
+        segment_audio(file_path, segment_duration)
 
 # Example usage
-process_directory("vocal/")
+process_directory("vocal/", .1)
