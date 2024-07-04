@@ -5,6 +5,7 @@ import numpy as np
 from pathlib import Path
 import scipy.io.wavfile as wavfile
 
+# 파일 안에 있는 보컬파일을 정해진 초만큼 나눠서 저장하는 function
 def segment_audio(file_path, segment_duration):
     y, sr = librosa.load(file_path, sr=None)
     segment_length = int(segment_duration * sr)
@@ -31,6 +32,7 @@ def segment_audio(file_path, segment_duration):
     
     print(f"Segments saved in {output_dir}")
 
+# 공백파일 제거 function
 def delete_silent_files(directory_path, silence_threshold=0.001):
     for file_path in Path(directory_path).glob("*.wav"):
         y, sr = librosa.load(file_path, sr=None)
@@ -38,6 +40,7 @@ def delete_silent_files(directory_path, silence_threshold=0.001):
             os.remove(file_path)
             print(f"Deleted silent file: {file_path}")
 
+# Dominant frequency를 구하는 function
 def get_frequency(file_path):
     # Read the WAV file
     sample_rate, data = wavfile.read(file_path)
@@ -62,6 +65,7 @@ def get_frequency(file_path):
 
     return dominant_frequency_in_hz
 
+# Dominant frequency를 기준으로 카테고리를 나누는 function
 def categorize_frequency(frequency, gender):
     if gender == 'male':
         if frequency > 350:
@@ -85,15 +89,8 @@ def categorize_frequency(frequency, gender):
             return 'low_pitch'
         else:
             return 'unknown'
-
-def process_directory(directory_path, segment_duration, gender):
-    audio_files = [f for f in os.listdir(directory_path) if f.endswith('.wav')]
-    for audio_file in audio_files:
-        file_path = Path(directory_path) / audio_file
-        segment_audio(file_path, segment_duration)
-        delete_silent_files(file_path.parent / (file_path.stem + "_segments"))
-        classify_and_rename_segments(file_path.parent / (file_path.stem + "_segments"), gender)
-
+        
+# 나눠진 카테고리를 기준으로 파일을 저장하는 function
 def classify_and_rename_segments(segment_dir, gender):
     # Initialize counters for each category
     classification_counters = {
@@ -124,5 +121,13 @@ def classify_and_rename_segments(segment_dir, gender):
         # Increment the counter for the current category
         classification_counters[category] += 1
 
-# Example usage
-process_directory("vocal/", 1, 'male')  # Change 'male' to 'female' for female gender
+def run(directory_path, segment_duration, gender):
+    audio_files = [f for f in os.listdir(directory_path) if f.endswith('.wav')]
+    for audio_file in audio_files:
+        file_path = Path(directory_path) / audio_file
+        segment_audio(file_path, segment_duration)
+        delete_silent_files(file_path.parent / (file_path.stem + "_segments"))
+        classify_and_rename_segments(file_path.parent / (file_path.stem + "_segments"), gender)
+
+# 코드 실행
+run("vocal/audio", 1, 'male')  # Change 'male' to 'female' for female gender
